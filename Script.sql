@@ -1,5 +1,5 @@
 -- Name:Xiaoxiao Cao,ID:103043833,Name:Sariya Tusa,ID:
--- /////////////Task1.1///////////////////////////////////////////////
+-- ////////////////////////////Task1.1///////////////////////////////////////////////
 SELECT name
 from sys.databases;
 -- create database DW3833
@@ -17,7 +17,7 @@ CREATE TABLE ERROREVENT
     [ACTION] NVARCHAR(50),
     CONSTRAINT ERROREVENTACTION CHECK (ACTION IN ('SKIP','MODIFY'))
 );
--- ///////////////////////Task1.2/////////////////////////////////////
+-- ////////////////////////////////////////Task1.2/////////////////////////////////////
 IF OBJECT_ID('DWPROD') IS NOT NULL
 DROP TABLE DWPROD;
 IF OBJECT_ID('DWCUST') IS NOT NULL
@@ -31,22 +31,31 @@ GO;
 -- GO
 SELECT *
 FROM TPS.dbo.PRODUCT
--- WHERE Prodname IS NULL
-WHERE Manufacturercode IS NULL
+WHERE Prodcategory NOT IN (1,2,3,5,6,9)
+OR Prodcategory is null
+-- WHERE Manufacturercode IS NULL
 SELECT *
 FROM TPS.dbo.PRODCATEGORY
-SELECT *
-FROM TPS.dbo.MANUFACTURER
-SELECT *
-FROM TPS.dbo.SHIPPING
+-- SELECT *
+-- FROM TPS.dbo.MANUFACTURER
+-- SELECT *
+-- FROM TPS.dbo.SHIPPING
 SELECT *
 FROM TPS.dbo.SALEMELB
+WHERE Prodid =10780
+or Prodid=10746
+or Prodid=10813
 SELECT *
-FROM TPS.dbo.CUSTCATEGORY
-SELECT*
-FROM TPS.dbo.CUSTBRIS
-SELECT *
-FROM TPS.dbo.CUSTMELB
+FROM TPS.dbo.SALEBRIS
+WHERE Prodid =10780
+or Prodid=10746
+or Prodid=10813
+-- SELECT *
+-- FROM TPS.dbo.CUSTCATEGORY
+-- SELECT*
+-- FROM TPS.dbo.CUSTBRIS
+-- SELECT *
+-- FROM TPS.dbo.CUSTMELB
 SELECT *
 FROM TPS.dbo.SALEBRIS
 WHERE Prodid=10744
@@ -100,7 +109,7 @@ CREATE TABLE DWSALE
     FOREIGN KEY (DWPRODID) REFERENCES DWPROD
 
 )
--- /////////////////////////////TASK1.3////////////////////////////////////////
+-- //////////////////////////////////////////TASK1.3////////////////////////////////////////
 IF OBJECT_ID('GENDERSPELLING') IS NOT NULL
 DROP TABLE GENDERSPELLING;
 GO
@@ -121,7 +130,7 @@ INSERT INTO  GENDERSPELLING([Invalid Value],  [New Value] )VALUES
     ('FEMAIL','F')
 -- SELECT *
 -- FROM GENDERSPELLING
--- //////////////////////////////////////TASK2.1////////////////////
+-- ////////////////////////////////////////////TASK2.1////////////////////////////////////////
 -- Question for TIM: HERE DATETIME INCLUDE SALEDATE AND SHIPDATE OR IS IT THE SYSTERM DATE?????
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SB.Saledate
@@ -135,7 +144,7 @@ WHERE P.Prodname is NULL
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SB.Shipdate
 FROM TPS.dbo.PRODUCT P
-INNER JOIN 
+inner JOIN 
 TPS.dbo.SALEBRIS SB
 ON 
 P.Prodid=SB.Prodid
@@ -146,7 +155,7 @@ WHERE P.Prodname is NULL
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SM.Saledate
 FROM TPS.dbo.PRODUCT P
-INNER JOIN 
+inner JOIN 
 TPS.dbo.SALEMELB SM
 ON 
 P.Prodid=SM.Prodid
@@ -167,13 +176,13 @@ SET SOURCE_TABLE='PRODUCT',
    FILTERID=1,
    [ACTION]='SKIP'
 -- TEST----
--- SELECT * FROM ERROREVENT
--- //////////////////////////////TASK2.2///////////////////////////
+SELECT * FROM ERROREVENT
+-- /////////////////////////////////////////TASK2.2//////////////////////////////////////////////////////
 
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SB.Saledate
 FROM TPS.dbo.PRODUCT P
-INNER JOIN 
+Left JOIN 
 TPS.dbo.SALEBRIS SB
 ON 
 P.Prodid=SB.Prodid
@@ -182,7 +191,7 @@ WHERE P.Manufacturercode IS NULL
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SB.Shipdate
 FROM TPS.dbo.PRODUCT P
-INNER JOIN 
+Left JOIN 
 TPS.dbo.SALEBRIS SB
 ON 
 P.Prodid=SB.Prodid
@@ -190,23 +199,23 @@ WHERE P.Manufacturercode IS NULL
 
 
 
-INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
-SELECT P.Prodid,SM.Saledate
-FROM TPS.dbo.PRODUCT P
-INNER JOIN 
-TPS.dbo.SALEMELB SM
-ON 
-P.Prodid=SM.Prodid
-WHERE P.Manufacturercode IS NULL
+-- INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
+-- SELECT P.Prodid,SM.Saledate
+-- FROM TPS.dbo.PRODUCT P
+-- INNER JOIN 
+-- TPS.dbo.SALEMELB SM
+-- ON 
+-- P.Prodid=SM.Prodid
+-- WHERE P.Manufacturercode IS NULL
 
-INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
-SELECT P.Prodid,SM.Shipdate
-FROM TPS.dbo.PRODUCT P
-INNER JOIN 
-TPS.dbo.SALEMELB SM
-ON 
-P.Prodid=SM.Prodid
-WHERE P.Manufacturercode IS NULL
+-- INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
+-- SELECT P.Prodid,SM.Shipdate
+-- FROM TPS.dbo.PRODUCT P
+-- INNER JOIN 
+-- TPS.dbo.SALEMELB SM
+-- ON 
+-- P.Prodid=SM.Prodid
+-- WHERE P.Manufacturercode IS NULL
 
 UPDATE ERROREVENT
 SET SOURCE_TABLE='PRODUCT',
@@ -214,8 +223,39 @@ SET SOURCE_TABLE='PRODUCT',
    [ACTION]='MODIFY'
    WHERE FILTERID IS NULL
 
---   TEST
--- SELECT * FROM ERROREVENT
--- NOTE: NOTHING INSERTED INTO THE TABLE
--- ////////////////////////////////////TASK2.3/////////////////////////////
+--    delete 
+--    from ERROREVENT 
+--    WHERE FILTERID=2
 
+--   TEST RESULT
+SELECT * FROM ERROREVENT
+-- NOTE: NOTHING INSERTED INTO THE TABLE
+-- //////////////////////////////////////////////////TASK2.3///////////////////////////////////////////
+
+
+INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
+SELECT P.Prodid,SB.Saledate
+FROM TPS.dbo.PRODUCT P
+Left JOIN 
+TPS.dbo.SALEBRIS SB
+ON 
+P.Prodid=SB.Prodid
+WHERE (Prodcategory NOT IN ( select Productcategory from TPS.dbo.PRODCATEGORY)
+OR Prodcategory is null)
+
+INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
+SELECT P.Prodid,SB.Shipdate
+FROM TPS.dbo.PRODUCT P
+Left JOIN 
+TPS.dbo.SALEBRIS SB
+ON 
+P.Prodid=SB.Prodid
+WHERE (Prodcategory NOT IN ( select Productcategory from TPS.dbo.PRODCATEGORY)
+OR Prodcategory is null)
+
+UPDATE ERROREVENT
+SET SOURCE_TABLE='PRODUCT',
+   FILTERID=3,
+   [ACTION]='MODIFY'
+   WHERE FILTERID IS NULL
+   
