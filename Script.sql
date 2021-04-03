@@ -31,8 +31,9 @@ GO;
 -- GO
 SELECT *
 FROM TPS.dbo.PRODUCT
-WHERE Prodcategory NOT IN (1,2,3,5,6,9)
-OR Prodcategory is null
+Where Prodname is null
+-- WHERE Prodcategory NOT IN (1,2,3,5,6,9)
+-- OR Prodcategory is null
 -- WHERE Manufacturercode IS NULL
 SELECT *
 FROM TPS.dbo.PRODCATEGORY
@@ -135,7 +136,7 @@ INSERT INTO  GENDERSPELLING([Invalid Value],  [New Value] )VALUES
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SB.Saledate
 FROM TPS.dbo.PRODUCT P
-INNER JOIN 
+LEFT JOIN 
 TPS.dbo.SALEBRIS SB
 ON 
 P.Prodid=SB.Prodid
@@ -144,7 +145,7 @@ WHERE P.Prodname is NULL
 INSERT INTO ERROREVENT(SOURCE_ID,[DATETIME])
 SELECT P.Prodid,SB.Shipdate
 FROM TPS.dbo.PRODUCT P
-inner JOIN 
+LEFT JOIN 
 TPS.dbo.SALEBRIS SB
 ON 
 P.Prodid=SB.Prodid
@@ -225,7 +226,7 @@ SET SOURCE_TABLE='PRODUCT',
 
 --    delete 
 --    from ERROREVENT 
---    WHERE FILTERID=2
+--    WHERE FILTERID=1
 
 --   TEST RESULT
 SELECT * FROM ERROREVENT
@@ -258,4 +259,12 @@ SET SOURCE_TABLE='PRODUCT',
    FILTERID=3,
    [ACTION]='MODIFY'
    WHERE FILTERID IS NULL
-   
+--    ///////////////////////////////////////////TASK2.4.1///////////////////////
+-- 10785,10822,10744,10767,10780,10746,10813,
+
+-- SELECT * FROM
+-- TPS.dbo.PRODUCT
+-- WHERE Prodid NOT IN (
+--     SELECT SOURCE_ID FROM ERROREVENT
+-- )
+-- ////////////////////////////////////////////TASK2.4.2///////////////////////////
