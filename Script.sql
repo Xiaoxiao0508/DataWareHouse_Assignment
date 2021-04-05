@@ -1,7 +1,7 @@
 -- Name:Xiaoxiao Cao,ID:103043833
 -- ////////////////////////////Task1.1///////////////////////////////////////////////
-SELECT name
-from sys.databases;
+-- SELECT name
+-- from sys.databases;
 -- create database DW3833
 use DW3833
 IF OBJECT_ID('ERROREVENT') IS NOT NULL
@@ -24,23 +24,23 @@ IF OBJECT_ID('DWCUST') IS NOT NULL
 DROP TABLE DWCUST;
 IF OBJECT_ID('DWSALE') IS NOT NULL
 DROP TABLE DWSALE;
-GO;
+GO
 -- use TPS
 -- SELECT table_catalog[database], table_schema [schema], table_name name, table_type type
 -- FROM INFORMATION_SCHEMA.TABLES
 -- GO
-SELECT *
-FROM TPS.dbo.PRODUCT
+-- SELECT *
+-- FROM TPS.dbo.PRODUCT
 -- Where Prodname is null
 -- -- WHERE Prodcategory NOT IN (1,2,3,5,6,9)
 -- -- OR Prodcategory is null
 -- -- WHERE Manufacturercode IS NULL
-SELECT *
-FROM TPS.dbo.PRODCATEGORY
-SELECT *
-FROM TPS.dbo.MANUFACTURER
-SELECT *
-FROM TPS.dbo.SHIPPING
+-- SELECT *
+-- FROM TPS.dbo.PRODCATEGORY
+-- SELECT *
+-- FROM TPS.dbo.MANUFACTURER
+-- SELECT *
+-- FROM TPS.dbo.SHIPPING
 -- SELECT *
 -- FROM TPS.dbo.SALEMELB
 -- WHERE Prodid =10780
@@ -57,14 +57,14 @@ FROM TPS.dbo.SHIPPING
 -- FROM TPS.dbo.CUSTBRIS
 -- SELECT *
 -- FROM TPS.dbo.CUSTMELB
-SELECT *
-FROM TPS.dbo.SALEBRIS
-WHERE Prodid=10744
-OR  Prodid=10767
-SELECT *
-FROM TPS.dbo.SALEMELB
-WHERE Prodid=10744
-OR  Prodid=10767
+-- SELECT *
+-- FROM TPS.dbo.SALEBRIS
+-- WHERE Prodid=10744
+-- OR  Prodid=10767
+-- SELECT *
+-- FROM TPS.dbo.SALEMELB
+-- WHERE Prodid=10744
+-- OR  Prodid=10767
 
 CREATE TABLE DWPROD
 (
@@ -143,7 +143,7 @@ SET SOURCE_TABLE='PRODUCT',
    FILTERID=1,
    [ACTION]='SKIP'
 -- TEST----
-SELECT * FROM ERROREVENT
+-- SELECT * FROM ERROREVENT
 -- /////////////////////////////////////////TASK2.2 Filter #2//////////////////////////////////////////////////////
 
 INSERT INTO ERROREVENT(SOURCE_ID)
@@ -157,9 +157,8 @@ SET SOURCE_TABLE='PRODUCT',
    [ACTION]='MODIFY'
    WHERE FILTERID IS NULL
 
-
 --   TEST RESULT
-SELECT * FROM ERROREVENT
+-- SELECT * FROM ERROREVENT
 -- NOTE: NOTHING INSERTED INTO THE TABLE
 -- //////////////////////////////////////////////////TASK2.3 Filter#3///////////////////////////////////////////
 
@@ -185,23 +184,92 @@ SET SOURCE_TABLE='PRODUCT',
 --     SELECT SOURCE_ID FROM ERROREVENT)
 ​
 -- ////////////////////////////////////////////TASK2.4.2///////////////////////////
-SELECT PR.Prodid,PR.Prodname,PC.CATEGORYNAME
+-- SELECT PR.Prodid,PR.Prodname,PC.CATEGORYNAME,M.Manuname,SH.DESCRIPTION
+-- FROM TPS.dbo.PRODUCT PR
+-- left JOIN
+-- TPS.dbo.PRODCATEGORY PC
+-- ON
+-- PR.Prodcategory=PC.Productcategory
+-- left JOIN
+-- TPS.dbo.MANUFACTURER M
+-- ON
+-- PR.Manufacturercode=M.Manucode
+-- left JOIN
+-- TPS.dbo.SHIPPING SH
+-- ON
+-- PR.Shippingcode=SH.Shippingcode
+-- WHERE Prodid NOT IN (
+--     SELECT SOURCE_ID FROM ERROREVENT)
+
+-- /////////////////////////////////////////TASK2.4.3//////////////////////
+
+INSERT INTO  DWPROD
+(DWSOURCEID,PRODNAME,PRODCATNAME,PRODMANUNAME,PRODSHIPNAME) 
+SELECT PR.Prodid,PR.Prodname,PC.CATEGORYNAME,M.Manuname,SH.DESCRIPTION
 FROM TPS.dbo.PRODUCT PR
 left JOIN
 TPS.dbo.PRODCATEGORY PC
 ON
 PR.Prodcategory=PC.Productcategory
-
-SELECT PR.Prodid,PR.Prodname,M.Manuname
-FROM TPS.dbo.PRODUCT PR
 left JOIN
 TPS.dbo.MANUFACTURER M
 ON
 PR.Manufacturercode=M.Manucode
-
-SELECT PR.Prodid,PR.Prodname,SH.DESCRIPTION
-FROM TPS.dbo.PRODUCT PR
 left JOIN
 TPS.dbo.SHIPPING SH
 ON
 PR.Shippingcode=SH.Shippingcode
+WHERE Prodid NOT IN (
+    SELECT SOURCE_ID FROM ERROREVENT)
+-- SELECT *
+-- FROM DWPROD
+-- ------------------------------------------TASK2.4.4//////////////////////
+INSERT INTO  DWPROD
+(DWSOURCEID,PRODNAME,PRODCATNAME,PRODMANUNAME,PRODSHIPNAME) 
+SELECT PR.Prodid,PR.Prodname,PC.CATEGORYNAME,M.Manuname,SH.DESCRIPTION
+FROM TPS.dbo.PRODUCT PR
+left JOIN
+TPS.dbo.PRODCATEGORY PC
+ON
+PR.Prodcategory=PC.Productcategory
+left JOIN
+TPS.dbo.MANUFACTURER M
+ON
+PR.Manufacturercode=M.Manucode
+left JOIN
+TPS.dbo.SHIPPING SH
+ON
+PR.Shippingcode=SH.Shippingcode
+INNER JOIN
+ERROREVENT ER
+ON PR.Prodid=ER.SOURCE_ID
+WHERE ER.FILTERID=2
+
+UPDATE DWPROD
+SET PRODMANUNAME='UNKNOWN'
+WHERE PRODMANUNAME IS NULL
+-- /////////////////////////////////////////TASK 2.4.5/////////////////////////
+INSERT INTO  DWPROD
+(DWSOURCEID,PRODNAME,PRODCATNAME,PRODMANUNAME,PRODSHIPNAME) 
+SELECT PR.Prodid,PR.Prodname,PC.CATEGORYNAME,M.Manuname,SH.DESCRIPTION
+FROM TPS.dbo.PRODUCT PR
+left JOIN
+TPS.dbo.PRODCATEGORY PC
+ON
+PR.Prodcategory=PC.Productcategory
+left JOIN
+TPS.dbo.MANUFACTURER M
+ON
+PR.Manufacturercode=M.Manucode
+left JOIN
+TPS.dbo.SHIPPING SH
+ON
+PR.Shippingcode=SH.Shippingcode
+INNER JOIN
+ERROREVENT ER
+ON PR.Prodid=ER.SOURCE_ID
+WHERE ER.FILTERID=3
+
+UPDATE DWPROD
+SET PRODCATNAME='UNKNOWN'
+WHERE PRODMANUNAME IS NULL
