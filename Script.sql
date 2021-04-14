@@ -48,9 +48,7 @@ GO
 -- WHERE Prodid =10780
 -- or Prodid=10746
 -- or Prodid=10813
--- SELECT *
--- FROM TPS.dbo.SALEBRIS
--- WHERE Prodid =10780
+
 -- or Prodid=10746
 -- or Prodid=10813
 -- SELECT *
@@ -539,3 +537,43 @@ WHERE CM.Custid NOT IN
  AND CM.Sname=DC.SURNAME
  AND CM.Postcode=DC.POSTCODE
 )
+-- ///////////////////////////////////////////////////TASK5.1 fILTER #8////////////////////////
+
+SELECT *
+FROM DWPROD
+SELECT *
+FROM TPS.dbo.SALEBRIS SB
+-- SALEid 31122,31123,31126,31130
+
+
+INSERT INTO ERROREVENT
+(SOURCE_ID,SOURCE_TABLE,FILTERID,[DATETIME],[ACTION])
+SELECT SB.Saleid, 'SALEBRIS', 8, (SELECT GETDATE()), 'SKIP'
+FROM TPS.dbo.SALEBRIS SB
+WHERE SB.Prodid NOT IN (
+    SELECT DWSOURCEID
+    FROM DWPROD DP
+) OR SB.Prodid IS NULL
+
+
+-- //////////////////////////////////////////////////////TASK5.2 Filter #9////////////////////////////
+-- Custid 640,1074
+SELECT *
+FROM DWCUST
+INSERT INTO ERROREVENT
+(SOURCE_ID,SOURCE_TABLE,FILTERID,[DATETIME],[ACTION])
+SELECT SB.Custid, 'SALEBRIS', 9,  GETDATE(), 'SKIP'
+FROM TPS.dbo.SALEBRIS SB
+WHERE SB.Custid NOT IN (
+    SELECT DWSOURCEIDBRIS
+    FROM DWCUST DW
+    -- INNER JOIN
+    -- TPS.dbo.SALEBRIS SB
+    -- ON SB.Custid =DW.DWSOURCEIDBRIS
+)
+OR SB.Custid IS NULL
+SELECT SB.Custid
+FROM TPS.dbo.SALEBRIS SB
+INNER JOIN DWCUST DW
+ON SB.Custid =DW.DWSOURCEIDBRIS
+
