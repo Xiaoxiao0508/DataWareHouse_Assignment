@@ -490,6 +490,7 @@ WHERE FILTERID=7
 UPDATE DWCUST
 SET GENDER='U'
 WHERE GENDER IS null
+select * from ERROREVENT
 
 
 -- ///////////////////////////////////TASK 4.1////////////////////////////////////////////////
@@ -543,6 +544,7 @@ SELECT *
 FROM DWPROD
 SELECT *
 FROM TPS.dbo.SALEBRIS SB
+
 -- SALEid 31122,31123,31126,31130
 
 
@@ -555,9 +557,16 @@ WHERE SB.Prodid NOT IN (
     FROM DWPROD DP
 ) OR SB.Prodid IS NULL
 
+-- SELECT *
+-- FROM TPS.dbo.SALEBRIS SB
+-- INNER JOIN DWPROD DW
+-- ON SB.Prodid=DW.DWSOURCEID
+
+
 
 -- //////////////////////////////////////////////////////TASK5.2 Filter #9////////////////////////////
 -- Custid 640,1074
+
 SELECT *
 FROM DWCUST
 INSERT INTO ERROREVENT
@@ -567,13 +576,31 @@ FROM TPS.dbo.SALEBRIS SB
 WHERE SB.Custid NOT IN (
     SELECT DWSOURCEIDBRIS
     FROM DWCUST DW
-    -- INNER JOIN
-    -- TPS.dbo.SALEBRIS SB
-    -- ON SB.Custid =DW.DWSOURCEIDBRIS
+    INNER JOIN
+    TPS.dbo.SALEBRIS SB
+    ON SB.Custid =DW.DWSOURCEIDBRIS
 )
 OR SB.Custid IS NULL
 SELECT SB.Custid
 FROM TPS.dbo.SALEBRIS SB
 INNER JOIN DWCUST DW
 ON SB.Custid =DW.DWSOURCEIDBRIS
+
+select *
+from ERROREVENT
+-- //////////////////////////////////////////////////TASK5.3 Filter #10//////////////////////////////////////
+
+INSERT INTO ERROREVENT
+(SOURCE_ID,SOURCE_TABLE,FILTERID,[DATETIME],[ACTION])
+SELECT SB.Custid, 'SALEBRIS', 10,  GETDATE(), 'MODIFY'
+FROM TPS.dbo.SALEBRIS SB
+WHERE SB.Shipdate<SB.Saledate
+-- /////////////////////////////////////////////////Task5.4 Filter #11//////////////////////////////////
+-- Custid 694 782 -- Saleid 31121,31133
+INSERT INTO ERROREVENT
+(SOURCE_ID,SOURCE_TABLE,FILTERID,[DATETIME],[ACTION])
+SELECT SB.Custid, 'SALEBRIS', 11,  GETDATE(), 'MODIFY'
+FROM TPS.dbo.SALEBRIS SB
+WHERE SB.Unitprice IS NULL
+-- //////////////////////////////////////////////TASK5.5////////////////////////////////////
 
